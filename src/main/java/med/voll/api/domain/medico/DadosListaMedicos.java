@@ -1,6 +1,4 @@
-package med.voll.api.medico;
-
-import org.springframework.data.domain.Page;
+package med.voll.api.domain.medico;
 
 public record DadosListaMedicos(Long id, String nome, String email , Especialidade especialidade, String crm, boolean ativo) {
 

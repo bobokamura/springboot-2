@@ -1,18 +1,17 @@
-package med.voll.api.exceptions;
+package med.voll.api.infra.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -31,14 +30,22 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
-    @ExceptionHandler(IntegrityViolationException.class)
-    public ResponseEntity<StandardError> integrityException(IntegrityViolationException e, HttpServletRequest request) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandardError> integrityException(MethodArgumentNotValidException e, HttpServletRequest request) {
         StandardError err = new StandardError();
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        var erros = e.getFieldErrors();
+
+        List<DadosErroValidacao> listError = new ArrayList<>();
+        erros.forEach(error -> {
+            DadosErroValidacao dadosErroValidacao = new DadosErroValidacao(error);
+            listError.add(dadosErroValidacao);
+        });
 
         err.setTimestamp(LocalDateTime.now());
         err.setStatus(status.value());
-        err.setMessage(e.getMessage());
+        err.setError(listError);
         err.setPath(request.getRequestURI());
 
         return ResponseEntity.status(status).body(err);

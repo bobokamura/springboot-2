@@ -1,28 +1,20 @@
 package med.voll.api.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import med.voll.api.endereco.DadosEndereco;
-import med.voll.api.endereco.Endereco;
-import med.voll.api.exceptions.IntegrityViolationException;
-import med.voll.api.exceptions.ResourceNotFoundException;
-import med.voll.api.medico.*;
+import med.voll.api.domain.medico.*;
+import med.voll.api.infra.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("medicos")
@@ -37,21 +29,14 @@ public class MedicoController {
     @PostMapping
     @Transactional
     public ResponseEntity<?> cadastrar(@RequestBody @Valid DadosCadastroMedico dados) {
-        try {
-            var medico = medicoRepository.save(new Medico(dados));
-            return ResponseEntity.created(UriComponentsBuilder
-                            .fromUriString("medicos/{id}")
-                            .buildAndExpand(medico.getId())
-                            .toUri())
-                    .body(new DadosDetalhamentoMedico(medico));
-        } catch (Exception e) {
-            throw new IntegrityViolationException(messageSource.getMessage(
-                    "message.medico.integrity-error",
-                    null,
-                    LocaleContextHolder.getLocale()
-            ));
-        }
+        var medico = medicoRepository.save(new Medico(dados));
+        return ResponseEntity.created(UriComponentsBuilder
+                        .fromUriString("medicos/{id}")
+                        .buildAndExpand(medico.getId())
+                        .toUri())
+                .body(new DadosDetalhamentoMedico(medico));
     }
+
 
     @PutMapping("/{id}")
     @Transactional
