@@ -37,7 +37,6 @@ public class MedicoController {
                 .body(new DadosDetalhamentoMedico(medico));
     }
 
-
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<?> updateMedico(@PathVariable Long id, @RequestBody @Valid DadosAtualizaMedico dados) {
@@ -74,7 +73,6 @@ public class MedicoController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-
     }
 
     @DeleteMapping("/exclusaoLogica/{id}")
@@ -87,9 +85,5 @@ public class MedicoController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-
-
     }
-
-
 }
